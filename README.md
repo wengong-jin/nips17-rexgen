@@ -25,6 +25,8 @@ This repository contains the data and codes of the paper:
 * USPTO/data.zip includes the train/dev/test split of USPTO dataset used in our paper. It has in total 480K fully atom mapped reactions. Each line in the file has two fields, separated by space:
   * Reaction smiles (both reactants and products are atom mapped)
   * Reaction center. That is, atom pairs whose bonds in between changed in the reaction. Atoms are represented by their atom map number given in the reaction smiles.
+
+* human/ directory contains the 80 reactions used in our human study.
   
 ## Codes
 Coming soon.
