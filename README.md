@@ -8,8 +8,8 @@ This repository contains the data and codes of the paper:
 * USPTO-15K/data.zip contains the train/dev/test split of USPTO-15K dataset used in our paper, borrowed from [Coley et al.](http://pubs.acs.org/doi/abs/10.1021/acscentsci.7b00064) Each line in the file has two fields, separated by space:
   * Reaction smiles (products are not atom mapped)
   * Four types of reaction edits: 
-    1. Atoms obtained Hydrogens
-    2. Atoms lost Hydrogens
+    1. Atoms lost Hydrogens
+    2. Atoms obtained Hydrogens
     3. Deleted bonds
     4. Added bonds
     
