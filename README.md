@@ -29,7 +29,10 @@ This repository contains the data and codes of the paper:
 * human/ directory contains the 80 reactions used in our human study.
   
 ## Codes
-Coming soon.
+Training and testing codes are in respective repositories:
+* core-wln-global/ includes codes for reaction core identification (referred as global model in the paper).
+* rank-wln/ includes codes for WLN + sum-pooling in the paper for candidate ranking
+* rank-diff-wln/ includes codes for WL Difference Network (WLDN) for candidate ranking
 
 ## Contributors
 Wengong Jin (wengong@csail.mit.edu)
