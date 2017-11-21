@@ -34,6 +34,8 @@ Training and testing codes are in respective repositories:
 * rank-wln/ includes codes for WLN + sum-pooling in the paper for candidate ranking
 * rank-diff-wln/ includes codes for WL Difference Network (WLDN) for candidate ranking
 
+Sample usage are provided in USPTO/README.md, which also applies to USPTO-15K.
+
 ## Contributors
 Wengong Jin (wengong@csail.mit.edu)
 
