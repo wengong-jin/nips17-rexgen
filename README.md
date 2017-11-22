@@ -34,7 +34,9 @@ Training and testing codes are in respective repositories:
 * rank-wln/ includes codes for WLN + sum-pooling in the paper for candidate ranking
 * rank-diff-wln/ includes codes for WL Difference Network (WLDN) for candidate ranking
 
-Sample usage are provided in USPTO/README.md, which also applies to USPTO-15K.
+Sample usage are provided in USPTO/README.md, which also applies to USPTO-15K. We used tensorflow-0.12.1 for development:
+
+https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-0.12.1-cp27-none-linux_x86_64.whl
 
 ## Contributors
 Wengong Jin (wengong@csail.mit.edu)
