@@ -28,10 +28,11 @@ To test model:
 ```
 python nntest.py --test ../data/train.txt --cand ../core-wln-global/test.cbond --hidden $HIDDEN --depth $DEPTH --ncand 2000 --ncore 8 --save_dir $MODELDIR > test.cbond
 ```
-This outputs top 5 candidate products in one line for each reaction. Note that this script only outputs the bond type assignment
-over each atom pair (single/double/triple/delete, etc). You need to run the next script that generates SMILES string of the product.
 
 Here `$MODELDIR` refers to folder `rank-wln/core8-320-3` (hidden=320,depth=3,ncore=8) or `rank-diff-wln/core8-300-2`(hidden=300,depth=2,ncore=8)
+
+This outputs top 5 candidate products in one line for each reaction. Note that this script only outputs the bond type assignment over each atom pair (single/double/triple/delete, etc). 
+You need to run the next script that generates SMILES string of the product.
 
 For evaluation:
 ```
