@@ -56,14 +56,14 @@ candidates = candidates - reactant
 candidates = tf.concat(0, [reactant, candidates])
 
 with tf.variable_scope("diff_encoder"):
-    reaction_fp = wl_diff_net(graph_inputs, candidates, hidden_size=hidden_size, depth=depth)
+    reaction_fp = wl_diff_net(graph_inputs, candidates, hidden_size=hidden_size, depth=1)
 
 reaction_fp = reaction_fp[1:]
 reaction_fp = tf.nn.relu(linear(reaction_fp, hidden_size, "rex_hidden"))
 
 score = tf.squeeze(linear(reaction_fp, 1, "score"), [1])
 
-tk = tf.minimum(10, tf.shape(score)[0])
+tk = tf.minimum(TOPK, tf.shape(score)[0])
 _, pred_topk = tf.nn.top_k(score, tk)
 
 tf.global_variables_initializer().run(session=session)

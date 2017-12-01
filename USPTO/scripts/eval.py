@@ -38,6 +38,8 @@ def edit_mol(rmol, edits):
             new_mol.AddBond(amap[x],amap[y],BOND_TYPE[t])
 
     pred_mol = new_mol.GetMol()
+
+    #Clear formal charges to make molecules valid
     for atom in pred_mol.GetAtoms():
         atom.ClearProp('molAtomMapNumber')
         if atom.GetSymbol() == 'N' and atom.GetFormalCharge() != 0:
@@ -93,11 +95,14 @@ if __name__ == "__main__":
                 x,y,t = int(x),int(y),int(t)
                 cbonds.append((x,y,t))
                 
+            #Generate products by modifying reactants with predicted edits.
             pred_smiles = edit_mol(rmol, cbonds)
             pred_smiles = set(pred_smiles)
             if psmiles <= pred_smiles:
                 rk = idx + 1
                 break
+
+            #Edit molecules with reactants kekulized. Sometimes previous editing fails due to RDKit sanitization error (edited molecule cannot be kekulized)
             try:
                 Chem.Kekulize(rmol)
             except Exception as e:

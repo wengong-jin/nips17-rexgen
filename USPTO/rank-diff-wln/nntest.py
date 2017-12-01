@@ -56,7 +56,7 @@ candidates = candidates - reactant
 candidates = tf.concat(0, [reactant, candidates])
 
 with tf.variable_scope("diff_encoder"):
-    reaction_fp = wl_diff_net(graph_inputs, candidates, hidden_size=hidden_size, depth=depth)
+    reaction_fp = wl_diff_net(graph_inputs, candidates, hidden_size=hidden_size, depth=1)
 
 reaction_fp = reaction_fp[1:]
 reaction_fp = tf.nn.relu(linear(reaction_fp, hidden_size, "rex_hidden"))
@@ -79,6 +79,7 @@ def read_data(coord):
         r,e = line.strip("\r\n ").split()
         cand = cand_f.readline()
         cbonds = []
+
         for b in cand.strip("\r\n ").split():
             x,y = b.split('-')
             x,y = int(x)-1,int(y)-1
@@ -106,7 +107,7 @@ t.start()
 
 saver = tf.train.Saver()
 saver.restore(session, tf.train.latest_checkpoint(opts.model_path))
-total = 0
+top1, top3, top5, top10, total = 0.0, 0.0, 0.0, 0.0, 0
 idxfunc = lambda x:x.GetIntProp('molAtomMapNumber')
 try:
     while not coord.should_stop():

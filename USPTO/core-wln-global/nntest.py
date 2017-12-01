@@ -10,7 +10,7 @@ from functools import partial
 import threading
 from multiprocessing import Queue
 
-NK = 20
+NK = 40
 
 parser = OptionParser()
 parser.add_option("-t", "--test", dest="train_path")
@@ -98,18 +98,27 @@ def read_data(path, coord):
     for it in xrange(0, len(data), batch_size):
         src_batch, edit_batch = [], []
         for i in xrange(batch_size):
-            react = data[it][0].split('>')[0]
+            react,_,p = data[it][0].split('>')
             src_batch.append(react)
             edits = data[it][1]
             edit_batch.append(edits)
             it = (it + 1) % len(data)
+
+            pmol = Chem.MolFromSmiles(p)
+            patoms = set([atom.GetAtomMapNum() for atom in pmol.GetAtoms()])
+            ratoms = []
+            for x in react.split('.'):
+                xmol = Chem.MolFromSmiles(x)
+                xatoms = [atom.GetAtomMapNum() for atom in xmol.GetAtoms()]
+                if len(set(xatoms) & patoms) > 0:
+                    ratoms.extend(xatoms)
+            queue.put(ratoms)
 
         src_tuple = smiles2graph_batch(src_batch)
         cur_bin, cur_label, sp_label = get_all_batch(zip(src_batch, edit_batch))
         feed_map = {x:y for x,y in zip(_src_holder, src_tuple)}
         feed_map.update({_label:cur_label, _binary:cur_bin})
         session.run(enqueue, feed_dict=feed_map)
-        queue.put(sp_label)
 
     coord.request_stop()
 
@@ -122,17 +131,14 @@ try:
     while not coord.should_stop():
         cur_topk, cur_dim = session.run([topk, label_dim])
         cur_dim = int(math.sqrt(cur_dim))
-        sp_label = queue.get()
         for i in xrange(batch_size):
-            pre,rec = 0,0
+            ratoms = queue.get()
             for j in xrange(NK):
                 k = cur_topk[i,j]
                 x = k / cur_dim + 1
                 y = k % cur_dim + 1
-                if x < y:
+                if x < y and  x in ratoms and y in ratoms:
                     print "%d-%d" % (x, y),
-                if cur_topk[i,j] in sp_label[i]:
-                    pre += 1
             print
 except Exception as e:
     sys.stderr.write(e)

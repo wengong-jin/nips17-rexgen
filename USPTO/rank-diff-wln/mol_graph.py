@@ -2,12 +2,13 @@ import rdkit
 import rdkit.Chem as Chem
 import numpy as np
 import random
+from edit_mol import get_product_smiles
 
 elem_list = ['C', 'N', 'O', 'S', 'F', 'Si', 'P', 'Cl', 'Br', 'Mg', 'Na', 'Ca', 'Fe', 'As', 'Al', 'I', 'B', 'V', 'K', 'Tl', 'Yb', 'Sb', 'Sn', 'Ag', 'Pd', 'Co', 'Se', 'Ti', 'Zn', 'H', 'Li', 'Ge', 'Cu', 'Au', 'Ni', 'Cd', 'In', 'Mn', 'Zr', 'Cr', 'Pt', 'Hg', 'Pb', 'W', 'Ru', 'Nb', 'Re', 'Te', 'Rh', 'Tc', 'Ba', 'Bi', 'Hf', 'Mo', 'U', 'Sm', 'Os', 'Ir', 'Ce','Gd','Ga','Cs', 'unknown']
 bond_types = [Chem.rdchem.BondType.SINGLE, Chem.rdchem.BondType.DOUBLE, Chem.rdchem.BondType.TRIPLE, Chem.rdchem.BondType.AROMATIC]
-atom_fdim = len(elem_list) + 6 + 6 + 6 + 1
+atom_fdim = len(elem_list) + 7 + 6 + 6 + 6 + 1
 bond_fdim = 5
-max_nb = 12
+max_nb = 10
 
 def onek_encoding_unk(x, allowable_set):
     if x not in allowable_set:
@@ -16,6 +17,7 @@ def onek_encoding_unk(x, allowable_set):
 
 def atom_features(atom):
     return np.array(onek_encoding_unk(atom.GetSymbol(), elem_list) 
+            + onek_encoding_unk(atom.GetFormalCharge(), [-3,-2,-1,0,1,2,3]) 
             + onek_encoding_unk(atom.GetDegree(), [0,1,2,3,4,5]) 
             + onek_encoding_unk(atom.GetExplicitValence(), [1,2,3,4,5,6])
             + onek_encoding_unk(atom.GetImplicitValence(), [0,1,2,3,4,5])
@@ -176,9 +178,23 @@ def smiles2graph(rsmiles, psmiles, core_bonds, cutoff=500, idxfunc=lambda x:x.Ge
         core_configs = [list(gold_bonds)] + core_configs
     else:
         core_configs[0], core_configs[idx] = core_configs[idx], core_configs[0]
+    
+    #Remove duplicates
+    
+    smiles0 = get_product_smiles(mol, core_configs[0], tatoms)
+    if len(smiles0) > 0:
+        cand_smiles = set([smiles0])
+        new_core_configs = [core_configs[0]]
 
-    if cutoff > 0:
-        core_configs = core_configs[:cutoff]
+        for core_conf in core_configs[1:]:
+            smiles = get_product_smiles(mol, core_conf, tatoms)
+            if smiles in cand_smiles or len(smiles) == 0:
+                continue
+            cand_smiles.add(smiles)
+            new_core_configs.append(core_conf)
+        core_configs = new_core_configs
+    
+    core_configs = core_configs[:cutoff]
 
     n_batch = len(core_configs) + 1
     labels = np.zeros((n_batch-1,))
@@ -350,4 +366,32 @@ def smiles2graph_test(rsmiles, core_bonds, idxfunc=lambda x:x.GetIntProp('molAto
         batch_nbs.append(num_nbs2)
 
     return (np.array([fatoms] * n_batch), np.array(batch_fbonds), packnb(batch_anb), packnb(batch_bnb), np.array(batch_nbs)), core_configs
+
+if __name__ == "__main__":
+    f = open('../data/train.single')
+    fcand = open('../core-wln-global/newtrain.cbond')
+
+    tot,acc = 0,0
+    for line in f:
+        line,e = line.strip("\r\n ").split()
+        r,_,p = line.split('>')
+        cand = fcand.readline()
+
+        cbonds = []
+        for b in e.split(';'):
+            x,y = b.split('-')
+            x,y = int(x)-1,int(y)-1
+            cbonds.append((x,y))
+        sbonds = set(cbonds)
+
+        for b in cand.strip("\r\n ").split():
+            x,y = b.split('-')
+            x,y = int(x)-1,int(y)-1
+            if (x,y) not in sbonds:
+                cbonds.append((x,y))
+        
+        if smiles2graph(r,p,cbonds[:6]) > 150:
+            acc += 1
+        tot += 1.0
+        print acc / tot
 
