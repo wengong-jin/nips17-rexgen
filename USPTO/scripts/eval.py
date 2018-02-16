@@ -46,12 +46,12 @@ def edit_mol(rmol, edits):
             bond_vals = sum([bond.GetBondTypeAsDouble() for bond in atom.GetBonds()])
             if bond_vals <= 3:
                 atom.SetFormalCharge(0)
-        elif atom.GetSymbol() == 'C' and atom.GetFormalCharge() != 0:
-            atom.SetFormalCharge(0)
         if atom.GetSymbol() == 'O' and atom.GetFormalCharge() != 0:
             bond_vals = sum([bond.GetBondTypeAsDouble() for bond in atom.GetBonds()])
             if bond_vals == 2:
                 atom.SetFormalCharge(0)
+        elif atom.GetSymbol() in ['Cl', 'I', 'P', 'C'] and atom.GetFormalCharge() != 0:
+            atom.SetFormalCharge(0)
 
     pred_smiles = Chem.MolToSmiles(pred_mol)
     pred_list = pred_smiles.split('.')
