@@ -4,6 +4,11 @@ This repository contains the data and codes of the paper:
 
 *Predicting Organic Reaction Outcomes with Weisfeiler-Lehman Network (NIPS 2017)* [PDF](https://arxiv.org/abs/1709.04555)
 
+## Updated Version
+We have updated our reaction predictor model and improved the results (shown in the table 1). The new github repo link is here: https://github.com/connorcoley/rexgen_direct. We suggest you to use the updated repo because it is written in  tensorflow version 1.3.0 (rather than 0.12.0). 
+
+<img src="https://github.com/wengong-jin/nips17-rexgen/blob/master/result.png" width="800">
+
 ## Data
 * USPTO-15K/data.zip contains the train/dev/test split of USPTO-15K dataset used in our paper, borrowed from [Coley et al.](http://pubs.acs.org/doi/abs/10.1021/acscentsci.7b00064) Each line in the file has two fields, separated by space:
   * Reaction smiles (products are not atom mapped)
